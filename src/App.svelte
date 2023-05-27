@@ -114,15 +114,18 @@
   <div class="reset" on:click={changeMap} role="button">
     🗑️
   </div>
+  <a href="https://github.com/x8BitRain/countryguessr" target="_blank" class="source">
+    Github
+  </a>
   <div class="guess-input__container">
     <input
       class="guess-input
         {incorrectGuess ? 'guess-input--invalid' : ''}
         {correctGuess ? 'guess-input--correct' : ''}"
        bind:this={inputRef}
-       type="text"
        on:keyup={checkCountry}
        bind:value={inputValue} autofocus
+       type="text"
     >
   </div>
 </main>
@@ -167,6 +170,11 @@
       bottom: 16px;
       font-size: 38px;
       cursor: pointer;
+    }
+    .source {
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
     }
     .map-container {
       display: flex;
