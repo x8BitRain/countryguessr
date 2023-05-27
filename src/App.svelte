@@ -31,7 +31,7 @@
     }
   };
 
-  $: path = `/mapsicon/all/${currentCountry?.iso?.toLowerCase()}/vector.svg`
+  $: path = `mapsicon/all/${currentCountry?.iso?.toLowerCase()}/vector.svg`
   changeMap()
 </script>
 
