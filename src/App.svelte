@@ -194,6 +194,7 @@
       padding: 0 30px 10px 30px;
       font-size: 34px;
       transition: border-color 150ms ease;
+      z-index: 10;
       &--invalid {
         border-bottom-color: #e11f1f;
       }
