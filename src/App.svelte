@@ -1,15 +1,16 @@
 <script lang="ts">
   import countries from './assets/countries.json';
+  import { onMount } from "svelte";
 
   interface ICountry {
     iso: string,
     country: string,
   }
-
+  const localstorageKey = 'countryGuessr:progress'
   let countryList: ICountry[] = countries.countries
-  let guessedCountries: ICountry[] = []
   let guessedCountriesAmount = 0
   let currentCountry: ICountry
+  let saveProgress = true;
   let inputValue
   let incorrectGuess = false;
   let correctGuess = false;
@@ -19,10 +20,40 @@
     return Math.floor(Math.random() * (max));
   };
 
+  const onReset = () => {
+    localStorage.removeItem(localstorageKey)
+    window.location.reload()
+  };
+
+  const onSaveProgress = () => {
+    const progress = {
+      countryList,
+      guessedCountriesAmount,
+      currentCountry,
+      saveProgress
+    }
+    localStorage.setItem(localstorageKey, JSON.stringify(progress))
+  };
+
+  const onLoadProgress = () => {
+    const localProgress = localStorage.getItem(localstorageKey)
+    if (!localProgress) return
+    const parsedLocalProgress = JSON.parse(localProgress)
+    if (parsedLocalProgress.saveProgress === false) {
+      changeMap()
+      return;
+    }
+    countryList = parsedLocalProgress.countryList
+    currentCountry = parsedLocalProgress.currentCountry
+    guessedCountriesAmount = parsedLocalProgress.guessedCountriesAmount
+    saveProgress = parsedLocalProgress.saveProgress
+  };
+
   const changeMap = () => {
     const length = countryList.length;
     currentCountry = countryList[randomNumber(length)];
     inputRef?.focus()
+    if (saveProgress) onSaveProgress()
   };
 
   const removeCountryFromList = () => {
@@ -34,13 +65,13 @@
     if (e.key !== 'Enter' || !inputValue) return
     if (currentCountry.country.toLowerCase() === inputValue.toLowerCase()) {
       inputValue = ''
-      guessedCountries.push(currentCountry)
       removeCountryFromList()
       guessedCountriesAmount++
       incorrectGuess = false
       correctGuess = true
       setTimeout(() => correctGuess = false, 280)
       changeMap()
+      if (saveProgress) onSaveProgress()
     } else {
       incorrectGuess = true
     }
@@ -53,8 +84,9 @@
     }
   })
 
+  onMount(() => onLoadProgress())
+
   $: path = `mapsicon/all/${currentCountry?.iso?.toLowerCase()}/vector.svg`
-  changeMap()
 </script>
 
 
@@ -69,12 +101,15 @@
   <div class="re-roll" on:click={changeMap} role="button">
     🔄
   </div>
-  <div class="save-progress" on:click={changeMap} role="button">
-    <input type="checkbox" id="save-progress">
+  <div class="save-progress" role="button">
+    <input type="checkbox" id="save-progress" bind:checked={saveProgress}>
     <label for="save-progress">Save progress</label>
   </div>
   <div class="map-container">
     <img class="map" src={path} alt="">
+  </div>
+  <div class="reset" on:click={changeMap} role="button">
+    🗑️
   </div>
   <div class="guess-input__container">
     <input
@@ -122,6 +157,13 @@
       position: absolute;
       bottom: 10px;
       left: 16px;
+    }
+    .reset {
+      position: absolute;
+      right: 24px;
+      bottom: 16px;
+      font-size: 38px;
+      cursor: pointer;
     }
     .map-container {
       display: flex;
