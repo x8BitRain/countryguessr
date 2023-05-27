@@ -37,7 +37,10 @@
 
   const onLoadProgress = () => {
     const localProgress = localStorage.getItem(localstorageKey)
-    if (!localProgress) return
+    if (!localProgress) {
+      changeMap();
+      return;
+    }
     const parsedLocalProgress = JSON.parse(localProgress)
     if (parsedLocalProgress.saveProgress === false) {
       changeMap()
